@@ -2,7 +2,7 @@
 
 ## Background: 
 
-We are given a CSV file with the a list of user data, specifically, the user id, age and favorite color. We would like to generate a reporting mechansims to compute different metrics about the users. In general, we don't know the file size that will be provided (and it might not fit into memory), hence we need plan to avoid these assumptions.
+We are given a CSV file with a list of user data, specifically, the user id, age and favorite color. We would like to generate a reporting mechanism to compute different metrics about the users. In general, we don't know the file size that will be provided (and it might not fit into memory).
 
 ## Requirements
 
