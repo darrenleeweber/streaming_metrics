@@ -20,4 +20,6 @@ We are given a CSV file with the a list of user data, specifically, the user id,
   
 
 Reminder, the data/file can only be iterated over ONCE and memory consumption remain approximately constant.
+
+Test data is provided in "users.csv"
   
