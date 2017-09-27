@@ -4,7 +4,7 @@
 
 We would like to start building a general reporting framework to compute basic metrics, such as median or total records processed from an IO source. 
 
-To make the problem more concrete, We are given a CSV file with a list of user data, specifically, the user id, age and favorite color. For these records, we would like to compute several metrics (defined below) about the user records that are processed and return a summary. In general, we don't know the file size, or the number of streamed records that will be provided (and it might not fit into memory).
+To make the problem more concrete, We are given a CSV file with a list of user data, specifically, the user id, age and favorite color. For these records, we would like to compute several metrics (defined below) and return a summary. In general, we don't know the file size, or the number of streamed records that will be provided (and it might not fit into memory).
 
 It's suggested to use either python or scala, however, you should use the language you're most proficient in. You should restrict your solution to use on the standard library of the language chosen.
 
