@@ -4,7 +4,7 @@
 
 We would like to start building a general reporting framework to compute basic metrics, such as median or total records processed from an IO source. 
 
-To make the problem more concrete, We are given a CSV file with a list of user data, specifically, the user id, age and favorite color. We would like to generate a reporting mechanism to compute different metrics about the users. In general, we don't know the file size that will be provided (and it might not fit into memory).
+To make the problem more concrete, We are given a CSV file with a list of user data, specifically, the user id, age and favorite color. For these records, we would like to compute several metrics (defined below) about the user records that are processed and return a summary. In general, we don't know the file size, or the number of streamed records that will be provided (and it might not fit into memory).
 
 It's suggested to use either python or scala, however, you should use the language you're most proficient in. You should restrict your solution to use on the standard library of the language chosen.
 
@@ -28,8 +28,8 @@ Test data is provided in "users.csv". However, in general, the datasource could 
 
 ## Future Iteration and Discussion Points
 
-- Could our API extendible to support searching over any field (e.g., user id, color) or fields in the User record?
+- Could your API be extended to support searching over any field (e.g., user id, color) or fields?
 - What is your recommended solution to communicate intermediate summaries? For example, after every 10000 records.
-- How would we generalize this to other Record types, with different fields, such as a Car with VIN, brand, purchased at, etc...
-- How would report errors with potentially malformed data from the IO source?
+- How would we generalize this reporting API to other Record types, with different fields, such as a Car with VIN, brand, purchased at, etc...
+- How would communicate errors with potentially malformed data from the IO source?
   
