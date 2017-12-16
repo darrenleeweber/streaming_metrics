@@ -83,7 +83,7 @@ import scala.io.Source
 //  - it likely involves creating a new class for the data entity (Car) and associated stats classes
 //  - once the additional classes are created, possibilities to identify OOP abstractions will arise
 //  - it would be ideal to look for opportunities to define common interfaces and use dependency injection
-//    - in this exerice, the interface forming includes #report, #to_json, and #update methods
+//    - in this exerice, the interface forming includes #report, #toJSON, and #update methods
 //    - the Stats class could accept a list of any type conforming to that interface (trait)
 //  - in this exercise, any attempts at premature abstractions were avoided
 //- How would communicate errors with potentially malformed data from the IO source?
@@ -107,7 +107,13 @@ object UserMetrics {
     User(data(0).toInt, data(1).toInt, parseColor(data(2)))
   }
 
-  case class AgeStats(var min:Int = 999, var max:Int = -999, var sum:Int = 0, var count:Int = 0) {
+  trait Reporter {
+    def report() : Unit
+    def toJSON() : String
+  }
+
+  case class AgeStats(var min:Int = 999, var max:Int = -999, var sum:Int = 0, var count:Int = 0)
+  extends Reporter {
 
     def mean() : Double = {
        if(count == 0) return Double.NaN
@@ -124,7 +130,7 @@ object UserMetrics {
       println()
     }
 
-    def to_json() : String = {
+    def toJSON() : String = {
       s"""{
         |      "count": ${count},
         |      "min": ${min},
@@ -144,7 +150,8 @@ object UserMetrics {
     }
   }
 
-  case class ColorStats(private val colors:collection.mutable.Map[String, Int] = collection.mutable.Map()) {
+  case class ColorStats(private val colors:collection.mutable.Map[String, Int] = collection.mutable.Map())
+  extends Reporter {
     // Top 5 favorite colors - regardless of ties
     def favorites() : scala.collection.immutable.ListMap[String,Int] = {
       sorted.slice(0, 5)
@@ -159,7 +166,7 @@ object UserMetrics {
       collection.immutable.ListMap(colors.toSeq.sortWith(_._2 > _._2):_*)
     }
 
-    def to_json() : String = {
+    def toJSON() : String = {
       s"""[ ${favorites().keys.mkString("\"", "\", \"", "\"")} ]"""
     }
 
@@ -168,7 +175,8 @@ object UserMetrics {
     }
   }
 
-  case class UserStats(title:String, age:AgeStats = AgeStats(), colors:ColorStats = ColorStats()) {
+  case class UserStats(title:String, age:AgeStats = AgeStats(), colors:ColorStats = ColorStats())
+  extends Reporter {
     def report() : Unit = {
       println(title)
       age.report()
@@ -176,10 +184,10 @@ object UserMetrics {
       println
     }
 
-    def to_json() : String = {
+    def toJSON() : String = {
       s""""${title}": {
-         |    "age": ${age.to_json},
-         |    "colors": ${colors.to_json}
+         |    "age": ${age.toJSON},
+         |    "colors": ${colors.toJSON}
          |}""".stripMargin
     }
 
@@ -190,13 +198,14 @@ object UserMetrics {
     }
   }
 
-  case class Stats(models:List[UserStats]) {
+  case class Stats(models:List[UserStats])
+  extends Reporter {
     def report() : Unit = {
       for(model <- models) model.report()
     }
 
-    def to_json() : String = {
-      models.map(_.to_json).mkString("{", ",", "}")
+    def toJSON() : String = {
+      models.map(_.toJSON).mkString("{", ",", "}")
     }
 
     def update(user: User) : Unit = {
@@ -218,11 +227,11 @@ object UserMetrics {
       } else {
         stats.update(parseUserCSV(line))
         // for intermediate summaries
-        //if(index % 500 == 0) println(stats.to_json())
+        //if(index % 500 == 0) println(stats.toJSON())
       }
       index += 1
     }
-    println(stats.to_json())
+    println(stats.toJSON())
   }
 
 }
