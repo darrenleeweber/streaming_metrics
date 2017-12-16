@@ -179,7 +179,7 @@ object UserMetrics {
     }
   }
 
-  case class UserStats(title:String, age:AgeStats = AgeStats(), colors:ColorStats = ColorStats())
+  class UserStats(title:String = "users", age:AgeStats = AgeStats(), colors:ColorStats = ColorStats())
     extends Accumulator[User] {
     def report() : Unit = {
       println(title)
@@ -196,7 +196,16 @@ object UserMetrics {
     }
 
     def update(user: User) : Unit = {
-      if(title == "adults" && user.age <= 21) return
+      age.update(user.age)
+      colors.update(user.color)
+    }
+  }
+
+  class AdultUserStats(title:String = "adults", age:AgeStats = AgeStats(), colors:ColorStats = ColorStats())
+    extends UserStats(title, age, colors) {
+
+    override def update(user: User) : Unit = {
+      if(user.age <= 21) return
       age.update(user.age)
       colors.update(user.color)
     }
@@ -220,7 +229,7 @@ object UserMetrics {
   def main(args: Array[String]): Unit = {
     // Source.fromFile() is an option if CLI is created
     val source = Source.stdin
-    val stats = Stats(List(UserStats("users"), UserStats("adults")))
+    val stats = Stats(List(new UserStats(), new AdultUserStats()))
 
     var headers : Array[String] = Array()
     var index = 0
