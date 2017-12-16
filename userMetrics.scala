@@ -112,11 +112,15 @@ object UserMetrics {
     def toJSON() : String
   }
 
+  trait Accumulator[DATA] extends Reporter {
+    def update(data: DATA) : Unit
+  }
+
   case class AgeStats(var min:Int = 999, var max:Int = -999, var sum:Int = 0, var count:Int = 0)
-  extends Reporter {
+    extends Accumulator[Int] {
 
     def mean() : Double = {
-       if(count == 0) return Double.NaN
+      if(count == 0) return Double.NaN
       sum / count
     }
 
@@ -132,11 +136,11 @@ object UserMetrics {
 
     def toJSON() : String = {
       s"""{
-        |      "count": ${count},
-        |      "min": ${min},
-        |      "max": ${max},
-        |      "mean": ${mean}
-        |    }""".stripMargin
+         |      "count": ${count},
+         |      "min": ${min},
+         |      "max": ${max},
+         |      "mean": ${mean}
+         |    }""".stripMargin
     }
 
     def update(age: Int) : Unit = {
@@ -151,7 +155,7 @@ object UserMetrics {
   }
 
   case class ColorStats(private val colors:collection.mutable.Map[String, Int] = collection.mutable.Map())
-  extends Reporter {
+    extends Accumulator[String] {
     // Top 5 favorite colors - regardless of ties
     def favorites() : scala.collection.immutable.ListMap[String,Int] = {
       sorted.slice(0, 5)
@@ -176,7 +180,7 @@ object UserMetrics {
   }
 
   case class UserStats(title:String, age:AgeStats = AgeStats(), colors:ColorStats = ColorStats())
-  extends Reporter {
+    extends Accumulator[User] {
     def report() : Unit = {
       println(title)
       age.report()
@@ -198,8 +202,8 @@ object UserMetrics {
     }
   }
 
-  case class Stats(models:List[UserStats])
-  extends Reporter {
+  case class Stats(models:List[Accumulator[User]])
+    extends Accumulator[User] {
     def report() : Unit = {
       for(model <- models) model.report()
     }
