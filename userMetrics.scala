@@ -4,17 +4,10 @@ object UserMetrics {
 
   case class User(id:Int, age:Int, color:String)
 
-  def parseColor(color:String) : String = {
-    var col = color.toLowerCase()
-    // US spellings
-    if(col == "grey") col = "gray"
-    col
-  }
-
   def parseUserCSV(line:String) : User = {
     // id, age, color
     val data = line.split(',').map(_.trim)
-    User(data(0).toInt, data(1).toInt, parseColor(data(2)))
+    User(data(0).toInt, data(1).toInt, data(2))
   }
 
   trait Reporter {
@@ -81,36 +74,54 @@ object UserMetrics {
     }
   }
 
-  case class ColorStats(private val colors:collection.mutable.Map[String, Int] = collection.mutable.Map())
-    extends Accumulator[String] {
+  trait StringCounter extends Accumulator[String] {
+    val strings:collection.mutable.Map[String, Int] = collection.mutable.Map()
+
+    def sorted() : collection.immutable.ListMap[String, Int] = {
+      collection.immutable.ListMap(strings.toSeq.sortWith(_._2 > _._2):_*)
+    }
+
+    def toJSON() : String = {
+      s"""[ ${strings.keys.mkString("\"", "\", \"", "\"")} ]"""
+    }
+
+    def update(string: String) : Unit = {
+      strings(string) = strings.getOrElse(string, 0) + 1
+    }
+  }
+
+  case class ColorFavorites() extends StringCounter {
     // Top 5 favorite colors - regardless of ties
     def favorites() : scala.collection.immutable.ListMap[String,Int] = {
       sorted.slice(0, 5)
     }
 
-    def report() : Unit = {
+    override def report() : Unit = {
       println("Favorite Colors:")
-      println(favorites().mkString("\t", "\n\t", "\n"))
+      println(favorites.mkString("\t", "\n\t", "\n"))
     }
 
-    def sorted() : collection.immutable.ListMap[String, Int] = {
-      collection.immutable.ListMap(colors.toSeq.sortWith(_._2 > _._2):_*)
+    override def toJSON() : String = {
+      s"""[ ${favorites.keys.mkString("\"", "\", \"", "\"")} ]"""
     }
 
-    def toJSON() : String = {
-      s"""[ ${favorites().keys.mkString("\"", "\", \"", "\"")} ]"""
+    override def update(string: String) : Unit = {
+      val color = parseColor(string)
+      strings(color) = strings.getOrElse(color, 0) + 1
     }
 
-    def update(color: String) : Unit = {
-      colors(color) = colors.getOrElse(color, 0) + 1
+    def parseColor(color:String) : String = {
+      var col = color.toLowerCase()
+      if(col == "grey") col = "gray" // US spelling (could use a good library for this)
+      // an argument could be made to map 'charcoal' -> 'gray', but that's not done here
+      col
     }
   }
 
-  class UserStats(title:String = "users")
-    extends Accumulator[User] {
+  class UserStats(title:String = "users") extends Accumulator[User] {
 
-    protected val colors:ColorStats = ColorStats()
     protected val age:IntStats = IntStats("age")
+    protected val colors:ColorFavorites = ColorFavorites()
 
     def report() : Unit = {
       println(title)
