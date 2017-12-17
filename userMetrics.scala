@@ -153,9 +153,7 @@ object UserMetrics {
     }
   }
 
-  class AdultUserStats(title:String = "adults")
-    extends UserStats(title) {
-
+  class AdultUserStats(title:String = "adults") extends UserStats(title) {
     override def update(user: User) : Unit = {
       if(user.age <= 21) return
       age.update(user.age)
