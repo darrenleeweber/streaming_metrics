@@ -22,45 +22,62 @@ object UserMetrics {
     def toJSON() : String
   }
 
-  trait Accumulator[DATA] extends Reporter {
-    def update(data: DATA) : Unit
+  trait Accumulator[T] extends Reporter {
+    def update(data: T) : Unit
   }
 
-  case class AgeStats(var min:Int = 999, var max:Int = -999, var sum:Int = 0, var count:Int = 0)
-    extends Accumulator[Int] {
+  trait NumericStats[T] extends Accumulator[T] {
+    def title:String
+    def count:T
+    def min:T
+    def max:T
+    def sum:T
 
-    def mean() : Double = {
-      if(count == 0) return Double.NaN
-      sum / count
-    }
+    def mean(): Double
 
-    def report() : Unit = {
+    // median is not calculated without accumulating all values in a stream process,
+    // otherwise constant memory constraint could be breached;
+    // median calculation requires a constant-memory stream algorithm - does one exist?
+    //def median(): T
+
+    def report(): Unit = {
       println("Count:\t" + count)
-      println("Age:")
+      println(s"${title}:")
       println("\tmin:\t" + min)
       println("\tmax:\t" + max)
-      println("\tmean:\t" + mean)
+      println("\tmean:\t" + mean())
       // println("median:\t" + median)
       println()
     }
 
-    def toJSON() : String = {
+    def toJSON(): String = {
       s"""{
          |      "count": ${count},
          |      "min": ${min},
          |      "max": ${max},
-         |      "mean": ${mean}
+         |      "mean": ${mean()}
          |    }""".stripMargin
+      // |      "median": median())
+    }
+  }
+
+  case class IntStats(title:String,
+                      var count:Int = 0,
+                      var min:Int = 999,
+                      var max:Int = -999,
+                      var sum:Int = 0)
+    extends NumericStats[Int] {
+
+    override def mean(): Double = {
+      if (count == 0) return Double.NaN
+      sum / count
     }
 
-    def update(age: Int) : Unit = {
+    override def update(value: Int) : Unit = {
       count += 1
-      sum += age
-      if(age > max) max = age
-      if(age < min) min = age
-      // median is not calculated without accumulating all values in a stream process,
-      // otherwise constant memory constraint could be breached;
-      // median calculation requires a constant-memory stream algorithm - does one exist?
+      sum += value
+      if(value > max) max = value
+      if(value < min) min = value
     }
   }
 
@@ -89,8 +106,12 @@ object UserMetrics {
     }
   }
 
-  class UserStats(title:String = "users", age:AgeStats = AgeStats(), colors:ColorStats = ColorStats())
+  class UserStats(title:String = "users")
     extends Accumulator[User] {
+
+    protected val colors:ColorStats = ColorStats()
+    protected val age:IntStats = IntStats("age")
+
     def report() : Unit = {
       println(title)
       age.report()
@@ -111,8 +132,8 @@ object UserMetrics {
     }
   }
 
-  class AdultUserStats(title:String = "adults", age:AgeStats = AgeStats(), colors:ColorStats = ColorStats())
-    extends UserStats(title, age, colors) {
+  class AdultUserStats(title:String = "adults")
+    extends UserStats(title) {
 
     override def update(user: User) : Unit = {
       if(user.age <= 21) return
