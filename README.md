@@ -43,6 +43,10 @@ test the submitted solution.
 
 The streaming process is interpreted as a unix pipe; the code reads from a STDIN source
 and outputs to STDOUT sink.  The scala script returns valid JSON.
+ - for prototype purposes an ease of command line use, all the code is in one script file
+   - to solidify the code for maintenance, traits and classes should be broken out
+   - unit tests are required for maintenance of the code in a production setting
+   - the code is easily navigated as it is in a decent IDE
  - some colors are converted to lower-case and some spelling conversion is done
  - TBD: streaming algorithm for median age, with constant memory footprint
 
@@ -74,7 +78,7 @@ $ cat users.csv | scala userMetrics.scala
   - this suggests that CLI options could be useful
   - depends what you mean by "searching"; more information is required to clearly define the requirements
   - if it is anything like the filtering based on age > 21, that's possible for other fields too
-    - these filters are similar to the AdultUserStats class that overrides the #update method
+    - these filters are similar to the UserStats/AdultUserStats class that overrides the #update method
     - the filters could either create additional data *group-by* data or *select* only the filtered results
 - What is your recommended solution to communicate intermediate summaries? For example, after every 10000 records.
   - See code comment in the UserMetrics.main() method
