@@ -54,10 +54,7 @@ object UserMetrics {
 
     def mean(): Double
 
-    // median is not calculated without accumulating all values in a stream process,
-    // otherwise constant memory constraint could be breached;
-    // median calculation requires a constant-memory stream algorithm - does one exist?
-    //def median(): T
+    def median(): Double
 
     def report(): Unit = {
       println("Count:\t" + count)
@@ -65,7 +62,7 @@ object UserMetrics {
       println("\tmin:\t" + min)
       println("\tmax:\t" + max)
       println("\tmean:\t" + mean())
-      // println("median:\t" + median)
+      println("\tmedian:\t" + median())
       println()
     }
 
@@ -75,8 +72,8 @@ object UserMetrics {
          |      "min": ${min},
          |      "max": ${max},
          |      "mean": ${mean()}
+         |      "median": ${median()}
          |    }""".stripMargin
-      // |      "median": median())
     }
   }
 
@@ -92,11 +89,32 @@ object UserMetrics {
       sum.toDouble / count.toDouble
     }
 
+    private val medianInt = MedianInt() // no bins
+    override def median(): Double = medianInt.median
+
     override def update(value: Int) : Unit = {
       count += 1
       sum += value
       if(value > max) max = value
       if(value < min) min = value
+      medianInt.update(value)
+    }
+  }
+
+  case class MedianInt() {
+    val vals = new collection.mutable.ListBuffer[Int]()
+
+    def median(): Double = {
+      val (lower, upper) = vals.sortWith(_<_).splitAt(vals.size / 2)
+      if (vals.size % 2 == 0) {
+        (lower.last.toDouble + upper.head.toDouble) / 2.0
+      } else {
+        upper.head.toDouble
+      }
+    }
+
+    def update(value:Int) : Unit = {
+      vals += value
     }
   }
 
