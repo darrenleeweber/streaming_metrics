@@ -89,7 +89,7 @@ object UserMetrics {
 
     override def mean(): Double = {
       if (count == 0) return Double.NaN
-      sum / count
+      sum.toDouble / count.toDouble
     }
 
     override def update(value: Int) : Unit = {
