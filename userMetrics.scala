@@ -171,14 +171,19 @@ object UserMetrics {
     User(data(0).toInt, data(1).toInt, data(2))
   }
 
-  def main(args: Array[String]): Unit = {
-    // Source.fromFile() is an option if CLI is created
-    val source = Source.stdin
-    val stats = UserAccumulators(List(new UserStats(), new AdultUserStats()))
+  def getSource(args: Array[String]) = {
+    if (args.length > 0) {
+      Source.fromFile(args(0))
+    } else {
+      Source.stdin
+    }
+  }
 
+  def main(args: Array[String]): Unit = {
+    val stats = UserAccumulators(List(new UserStats(), new AdultUserStats()))
     var headers : Array[String] = Array()
     var index = 0
-
+    val source = getSource(args)
     for (line <- source.getLines) {
       if(index == 0) {
         headers = line.split(',').map(_.trim)
