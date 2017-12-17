@@ -2,21 +2,47 @@ import scala.io.Source
 
 object UserMetrics {
 
-  case class User(id:Int, age:Int, color:String)
-
-  def parseUserCSV(line:String) : User = {
-    // id, age, color
-    val data = line.split(',').map(_.trim)
-    User(data(0).toInt, data(1).toInt, data(2))
-  }
-
   trait Reporter {
-    def report() : Unit
-    def toJSON() : String
+    def report(): Unit
+
+    def toJSON(): String
   }
 
   trait Accumulator[T] extends Reporter {
-    def update(data: T) : Unit
+    def update(data: T): Unit
+  }
+
+  trait Accumulators[T] extends Accumulator[T] {
+
+    val models:List[Accumulator[T]]
+
+    def report() : Unit = {
+      for(model <- models) model.report()
+    }
+
+    def toJSON() : String = {
+      models.map(_.toJSON).mkString("{", ",", "}")
+    }
+
+    def update(data: T) : Unit = {
+      for(model <- models) model.update(data)
+    }
+  }
+
+  trait StringCounter extends Accumulator[String] {
+    val strings:collection.mutable.Map[String, Int] = collection.mutable.Map()
+
+    def sorted() : collection.immutable.ListMap[String, Int] = {
+      collection.immutable.ListMap(strings.toSeq.sortWith(_._2 > _._2):_*)
+    }
+
+    def toJSON() : String = {
+      s"""[ ${strings.keys.mkString("\"", "\", \"", "\"")} ]"""
+    }
+
+    def update(string: String) : Unit = {
+      strings(string) = strings.getOrElse(string, 0) + 1
+    }
   }
 
   trait NumericStats[T] extends Accumulator[T] {
@@ -71,22 +97,6 @@ object UserMetrics {
       sum += value
       if(value > max) max = value
       if(value < min) min = value
-    }
-  }
-
-  trait StringCounter extends Accumulator[String] {
-    val strings:collection.mutable.Map[String, Int] = collection.mutable.Map()
-
-    def sorted() : collection.immutable.ListMap[String, Int] = {
-      collection.immutable.ListMap(strings.toSeq.sortWith(_._2 > _._2):_*)
-    }
-
-    def toJSON() : String = {
-      s"""[ ${strings.keys.mkString("\"", "\", \"", "\"")} ]"""
-    }
-
-    def update(string: String) : Unit = {
-      strings(string) = strings.getOrElse(string, 0) + 1
     }
   }
 
@@ -153,25 +163,20 @@ object UserMetrics {
     }
   }
 
-  case class Stats(models:List[Accumulator[User]])
-    extends Accumulator[User] {
-    def report() : Unit = {
-      for(model <- models) model.report()
-    }
+  case class UserAccumulators(models:List[Accumulator[User]]) extends Accumulators[User] {}
 
-    def toJSON() : String = {
-      models.map(_.toJSON).mkString("{", ",", "}")
-    }
+  case class User(id:Int, age:Int, color:String)
 
-    def update(user: User) : Unit = {
-      for(model <- models) model.update(user)
-    }
+  def parseUserCSV(line:String) : User = {
+    // id, age, color
+    val data = line.split(',').map(_.trim)
+    User(data(0).toInt, data(1).toInt, data(2))
   }
 
   def main(args: Array[String]): Unit = {
     // Source.fromFile() is an option if CLI is created
     val source = Source.stdin
-    val stats = Stats(List(new UserStats(), new AdultUserStats()))
+    val stats = UserAccumulators(List(new UserStats(), new AdultUserStats()))
 
     var headers : Array[String] = Array()
     var index = 0
