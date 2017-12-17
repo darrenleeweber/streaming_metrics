@@ -181,13 +181,11 @@ object UserMetrics {
 
   def main(args: Array[String]): Unit = {
     val stats = UserAccumulators(List(new UserStats(), new AdultUserStats()))
-    var headers : Array[String] = Array()
     var index = 0
     val source = getSource(args)
     for (line <- source.getLines) {
-      if(index == 0) {
-        headers = line.split(',').map(_.trim)
-      } else {
+      // skip header at index == 0
+      if(index > 0) {
         stats.update(parseUserCSV(line))
         // for intermediate summaries
         //if(index % 500 == 0) println(stats.toJSON())
