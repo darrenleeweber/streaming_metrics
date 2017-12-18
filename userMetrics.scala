@@ -89,8 +89,8 @@ object UserMetrics {
       sum.toDouble / count.toDouble
     }
 
-    // could use the MedianIntBinned to conserve memory
-    private val medianInt = MedianInt()
+    // Use the MedianIntBinned to conserve memory, at the expense of accuracy
+    private val medianInt = MedianIntBinned(5)
     override def median(): Double = medianInt.median
 
     override def update(value: Int) : Unit = {
