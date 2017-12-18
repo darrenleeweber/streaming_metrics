@@ -69,6 +69,7 @@ Notes on the solution:
    - TBD: streaming algorithm for median age, with constant memory footprint, e.g. see
    - https://stats.stackexchange.com/questions/346/what-is-a-good-algorithm-for-estimating-the-median-of-a-huge-read-once-data-set
    - https://stackoverflow.com/questions/4662292/scala-median-implementation
+   - see notes below and code in `medianOptions.scala`
 
 Notes on the code:
  - for prototype purposes an ease of command line use, all the code is in one script file
@@ -135,3 +136,24 @@ cat users.csv | scala userMetrics.scala
   - log informative (semantic) exception messages that identify problem records
   - apply log analysis tools to manage larger volumes of logs
 
+## Median Calculations
+
+Comparing results from a median and a "binned" median calculation (see `medianOptions.scala`).  The
+binned-median rounds off values and tracks counts of values in a Map.  It has a `binInterval` parameter
+to control the resolution of the bins, and thereby the accuracy of the results.  The aim of the
+binned-median was to conserve memory, regardless of performance.
+
+```bash
+$ scala medianOptions.scala 
+List(4, 4, 11, 12, 14, 20, 23, 25, 39, 39, 43, 43, 49, 52, 58, 65, 81, 86, 88, 91, 95)
+43.0
+40.0
+$ scala medianOptions.scala 
+List(12, 19, 21, 22, 27, 31, 46, 46, 47, 49, 51, 57, 59, 61, 70, 72, 72, 74, 74, 83, 99)
+51.0
+50.0
+$ scala medianOptions.scala 
+List(0, 1, 13, 18, 21, 21, 28, 32, 33, 42, 47, 49, 59, 61, 66, 72, 74, 89, 91, 91, 95)
+47.0
+45.0
+```

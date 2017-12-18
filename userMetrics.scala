@@ -89,7 +89,8 @@ object UserMetrics {
       sum.toDouble / count.toDouble
     }
 
-    private val medianInt = MedianInt() // no bins
+    // could use the MedianIntBinned to conserve memory
+    private val medianInt = MedianInt()
     override def median(): Double = medianInt.median
 
     override def update(value: Int) : Unit = {
@@ -102,10 +103,10 @@ object UserMetrics {
   }
 
   case class MedianInt() {
-    val vals = new collection.mutable.ListBuffer[Int]()
+    val vals = collection.mutable.ListBuffer[Int]()
 
     def median(): Double = {
-      val (lower, upper) = vals.sortWith(_<_).splitAt(vals.size / 2)
+      val (lower, upper) = vals.sorted.splitAt(vals.size / 2)
       if (vals.size % 2 == 0) {
         (lower.last.toDouble + upper.head.toDouble) / 2.0
       } else {
@@ -115,6 +116,31 @@ object UserMetrics {
 
     def update(value:Int) : Unit = {
       vals += value
+    }
+  }
+
+  case class MedianIntBinned(binInterval:Int) {
+    val vals = collection.mutable.Map[Int, Int]()
+
+    def findMedian(): Option[(Int, Int)] = {
+      val medianIndex = vals.values.sum / 2
+      var index = 0
+      vals.toSeq.sortWith(_._1 < _._1).find {
+        case(value, count) => index += count; index > medianIndex
+      }
+    }
+
+    def median(): Double = {
+      findMedian() match {
+        case Some(value) => value._1.toDouble
+        case None => Double.NaN
+      }
+    }
+
+    def update(value:Int) : Unit = {
+      // accumulate rounded values and count them in a Map
+      val v = value - (value % binInterval)
+      vals(v) = vals.getOrElse(v, 0) + 1
     }
   }
 
@@ -203,7 +229,7 @@ object UserMetrics {
     val source = getSource(args)
     for (line <- source.getLines) {
       // skip header at index == 0
-      if(index > 0) {
+      if (index > 0) {
         stats.update(parseUserCSV(line))
         // for intermediate summaries
         //if(index % 500 == 0) println(stats.toJSON())
