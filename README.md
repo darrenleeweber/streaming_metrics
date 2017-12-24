@@ -1,3 +1,6 @@
+
+[![Build Status](https://travis-ci.org/darrenleeweber/streaming_metrics.svg?branch=master)](https://travis-ci.org/darrenleeweber/streaming_metrics)
+
 # Computation of Report Metrics
 
 ## Background:
