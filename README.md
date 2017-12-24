@@ -75,12 +75,13 @@ Notes on the solution:
    - see notes below and code in `medianOptions.scala`
 
 Notes on the code:
+ - more unit tests are required for maintenance of the code in a production setting
  - for prototype purposes and easy command line use, all the code is in a scala script file
    - see `user_metrics/userMetrics.scala`
    - try `cat users.csv | scala user_metrics/userMetrics.scala`
- - a packaged jar can be built using the scala build tool (sbt)
-   - `sbt package` -> `target/scala*/streaming_metrics*.jar`
-   - more unit tests are required for maintenance of the code in a production setting
+ - an executable jar can be assembled using the scala build tool (sbt)
+   - `sbt assembly` -> `target/scala-{ver}/streaming_metrics-assembly-{ver}.jar`
+   - try `cat  ./users.csv  |  java -jar ./target/scala-2.12/streaming_metrics-assembly-0.1.0-SNAPSHOT.jar`
 
 ```
 $ sbt
