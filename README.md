@@ -1,3 +1,6 @@
+
+[![Build Status](https://travis-ci.org/darrenleeweber/streaming_metrics.svg?branch=master)](https://travis-ci.org/darrenleeweber/streaming_metrics)
+
 # Computation of Report Metrics
 
 ## Background:
@@ -143,17 +146,50 @@ binned-median rounds off values and tracks counts of values in a Map.  It has a 
 to control the resolution of the bins, and thereby the accuracy of the results.  The aim of the
 binned-median was to conserve memory, regardless of performance.
 
-```bash
-$ scala medianOptions.scala 
-List(4, 4, 11, 12, 14, 20, 23, 25, 39, 39, 43, 43, 49, 52, 58, 65, 81, 86, 88, 91, 95)
-43.0
-40.0
-$ scala medianOptions.scala 
-List(12, 19, 21, 22, 27, 31, 46, 46, 47, 49, 51, 57, 59, 61, 70, 72, 72, 74, 74, 83, 99)
+```
+$ sbt
+[info] Loading project definition from /data/src/streaming_metrics/project
+[info] Loading settings from build.sbt ...
+[info] Set current project to streaming_metrics (in build file:/data/src/streaming_metrics/)
+[info] sbt server started at 127.0.0.1:4227
+sbt:streaming_metrics> project median_options
+[info] Set current project to median_options (in build file:/data/src/streaming_metrics/)
+sbt:median_options> run
+[info] Packaging /data/src/streaming_metrics/median_options/target/scala-2.12/median_options_2.12-0.1.0-SNAPSHOT.jar ...
+[info] Done packaging.
+[info] Running org.example.metrics.MedianOptions 
+List(3, 13, 18, 20, 21, 23, 32, 40, 41, 43, 51, 51, 60, 66, 67, 70, 90, 95, 96, 96, 97)
 51.0
 50.0
-$ scala medianOptions.scala 
-List(0, 1, 13, 18, 21, 21, 28, 32, 33, 42, 47, 49, 59, 61, 66, 72, 74, 89, 91, 91, 95)
-47.0
+[success] Total time: 1 s, completed Dec 23, 2017 8:03:18 PM
+sbt:median_options> run
+[info] Running org.example.metrics.MedianOptions 
+List(1, 1, 1, 2, 7, 7, 29, 36, 42, 44, 48, 49, 60, 65, 66, 66, 67, 71, 81, 88, 89)
+48.0
 45.0
+[success] Total time: 0 s, completed Dec 23, 2017 8:03:22 PM
+sbt:median_options> run
+[info] Running org.example.metrics.MedianOptions 
+List(2, 6, 11, 21, 22, 27, 28, 33, 33, 33, 50, 61, 63, 70, 74, 79, 80, 83, 94, 95, 97)
+50.0
+50.0
+[success] Total time: 1 s, completed Dec 23, 2017 8:04:11 PM
+sbt:median_options> run
+[info] Running org.example.metrics.MedianOptions 
+List(1, 3, 14, 21, 25, 28, 38, 43, 44, 48, 52, 53, 58, 67, 70, 70, 79, 82, 83, 86, 97)
+52.0
+50.0
+[success] Total time: 0 s, completed Dec 23, 2017 8:04:14 PM
+sbt:median_options> run
+[info] Running org.example.metrics.MedianOptions 
+List(1, 6, 6, 10, 16, 20, 21, 24, 30, 32, 33, 47, 53, 53, 54, 58, 78, 81, 83, 94, 97)
+33.0
+30.0
+[success] Total time: 0 s, completed Dec 23, 2017 8:04:16 PM
+sbt:median_options> run
+[info] Running org.example.metrics.MedianOptions 
+List(5, 10, 37, 38, 42, 43, 45, 47, 48, 51, 53, 60, 61, 61, 70, 84, 87, 91, 92, 97, 97)
+53.0
+50.0
+[success] Total time: 0 s, completed Dec 23, 2017 8:04:19 PM
 ```
