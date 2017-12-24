@@ -8,12 +8,23 @@ class MedianIntSpecs extends SpecHelper {
         val medianInt = MedianInt()
         assert(medianInt.median.isNaN)
       }
-
-//      it("should produce NoSuchElementException when head is invoked") {
-//        assertThrows[NoSuchElementException] {
-//          Set.empty.head
-//        }
-//      }
     }
+
+    describe("with 1 to 9") {
+      it("median is 5.0") {
+        val medianInt = MedianInt()
+        (1 to 9).foreach { x => medianInt.update(x) }
+        assert(medianInt.median == 5.0)
+      }
+    }
+
+    describe("with 1 to 10") {
+      it("median is 5.5") {
+        val medianInt = MedianInt()
+        (1 to 10).foreach { x => medianInt.update(x) }
+        assert(medianInt.median == 5.5)
+      }
+    }
+
   }
 }
