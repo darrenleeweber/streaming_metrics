@@ -10,3 +10,6 @@ libraryDependencies ++= Seq(
   "org.scalactic" %% "scalactic" % "3.0.4",
   "org.scalatest" %% "scalatest" % "3.0.4" % "test"
 )
+
+test in assembly := {}
+mainClass in assembly := Some("org.example.metrics.UserMetrics")
