@@ -75,16 +75,16 @@ Notes on the solution:
    - see notes below and code in `medianOptions.scala`
 
 Notes on the code:
- - for prototype purposes an ease of command line use, all the code is in one script file
-   - to solidify the code for maintenance, traits and classes should be broken out
-   - unit tests are required for maintenance of the code in a production setting
-   - the code is easily navigated in a decent IDE
+ - for prototype purposes and easy command line use, all the code is in a scala script file
+   - see `user_metrics/userMetrics.scala`
+   - try `cat users.csv | scala user_metrics/userMetrics.scala`
+ - a packaged jar can be built using the scala build tool (sbt)
+   - `sbt package` -> `target/scala*/streaming_metrics*.jar`
+   - more unit tests are required for maintenance of the code in a production setting
 
 ```
 $ sbt
 sbt:streaming_metrics> runMain org.example.metrics.UserMetrics ./users.csv
-[warn] Multiple main classes detected.  Run 'show discoveredMainClasses' to see the list
-[info] Running org.example.metrics.UserMetrics ./users.csv
 {"users": {
     "age": {
       "count": 1000,
@@ -149,43 +149,28 @@ to control the resolution of the bins, and thereby the accuracy of the results. 
 binned-median was to conserve memory, regardless of performance.
 
 ```
-sbt
-[info] Loading settings from plugins.sbt ...
-[info] Loading project definition from /data/src/streaming_metrics/project
-[info] Loading settings from build.sbt ...
-[info] Set current project to streaming_metrics (in build file:/data/src/streaming_metrics/)
-[info] sbt server started at 127.0.0.1:4227
+$ sbt
 sbt:streaming_metrics> runMain org.example.metrics.MedianOptions
-[warn] Multiple main classes detected.  Run 'show discoveredMainClasses' to see the list
-[info] Running org.example.metrics.MedianOptions 
 List(8, 9, 12, 18, 21, 27, 35, 36, 43, 48, 48, 53, 53, 54, 56, 72, 73, 81, 84, 93, 97)
 48.0
 45.0
 [success] Total time: 1 s, completed Dec 23, 2017 10:24:32 PM
 sbt:streaming_metrics> runMain org.example.metrics.MedianOptions
-[warn] Multiple main classes detected.  Run 'show discoveredMainClasses' to see the list
-[info] Running org.example.metrics.MedianOptions 
 List(14, 18, 23, 25, 27, 30, 42, 43, 46, 53, 59, 70, 79, 81, 81, 84, 84, 87, 90, 97, 99)
 59.0
 55.0
 [success] Total time: 0 s, completed Dec 23, 2017 10:24:40 PM
 sbt:streaming_metrics> runMain org.example.metrics.MedianOptions
-[warn] Multiple main classes detected.  Run 'show discoveredMainClasses' to see the list
-[info] Running org.example.metrics.MedianOptions 
 List(1, 2, 8, 12, 13, 13, 17, 19, 21, 24, 25, 39, 54, 61, 64, 72, 77, 82, 82, 84, 84)
 25.0
 25.0
 [success] Total time: 0 s, completed Dec 23, 2017 10:24:46 PM
 sbt:streaming_metrics> runMain org.example.metrics.MedianOptions
-[warn] Multiple main classes detected.  Run 'show discoveredMainClasses' to see the list
-[info] Running org.example.metrics.MedianOptions 
 List(1, 2, 4, 10, 26, 27, 29, 33, 33, 39, 43, 44, 46, 51, 65, 67, 72, 73, 73, 88, 92)
 43.0
 40.0
 [success] Total time: 0 s, completed Dec 23, 2017 10:24:49 PM
 sbt:streaming_metrics> runMain org.example.metrics.MedianOptions
-[warn] Multiple main classes detected.  Run 'show discoveredMainClasses' to see the list
-[info] Running org.example.metrics.MedianOptions 
 List(0, 0, 6, 14, 16, 17, 18, 24, 24, 27, 33, 33, 42, 43, 48, 48, 52, 67, 68, 75, 77)
 33.0
 30.0
