@@ -11,6 +11,8 @@ object MedianIntCheck extends Properties("MedianInt") {
     val median = medianInt.median()
     if (lst.isEmpty) {
       median.isNaN
+    } else if (lst.size == 1) {
+      median == lst.head
     } else {
       lst.min <= median && median <= lst.max
     }
