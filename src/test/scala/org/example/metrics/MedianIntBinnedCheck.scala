@@ -11,11 +11,25 @@ object MedianIntBinnedCheck extends Properties("MedianIntBinned") {
     val median = medianInt.median()
     if (lst.isEmpty) {
       median.isNaN
+    } else if (lst.size == 1) {
+      median == lst.head.toDouble
     } else {
       lst.min <= median && median <= lst.max
     }
   }
 
-  // TODO: use a binInterval > 1
+  property("median:Binned") = forAll { (lst: List[Int]) =>
+    val binInterval = 2
+    val medianInt = MedianIntBinned(binInterval)
+    lst.foreach { i => medianInt.update(i) }
+    val median = medianInt.median()
+    if (lst.isEmpty) {
+      median.isNaN
+    } else if (lst.size == 1) {
+      median == (lst.head - (lst.head % binInterval)).toDouble
+    } else {
+      lst.min <= median && median <= lst.max
+    }
+  }
 
 }

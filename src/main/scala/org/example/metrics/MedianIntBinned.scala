@@ -9,43 +9,11 @@ package org.example.metrics
 // but this binned version would use _more_ memory.
 
 case class MedianIntBinned(binInterval:Int) {
-  val vals = collection.mutable.Map[Int, Int]()
-
-  def findMedianOdd(): Double = {
-    var index = 0
-    val medianIndex = vals.values.sum / 2
-    val sorted = vals.toSeq.sortWith(_._1 < _._1)
-    sorted.find {
-      case(value, count) => index += count; index > medianIndex
-    } match {
-      case Some(value_count) => value_count._1.toDouble
-      case None => Double.NaN
-    }
-  }
-
-  def findMedianEven(): Double = {
-    val lowerIndex = vals.values.sum / 2
-    val upperIndex = lowerIndex + 1
-    val sorted = vals.toSeq.sortWith(_._1 < _._1)
-    var index = 0
-    val lowerValue = sorted.find {
-      case(value, count) => index += count; index >= lowerIndex
-    } match {
-      case Some(value_count) => value_count._1.toDouble
-      case None => Double.NaN
-    }
-    index = 0
-    val upperValue = sorted.find {
-      case(value, count) => index += count; index >= upperIndex
-    } match {
-      case Some(value_count) => value_count._1.toDouble
-      case None => Double.NaN
-    }
-    (lowerValue + upperValue) / 2.0
-  }
+  private val vals = collection.mutable.Map[Int, Int]()
 
   def median(): Double = {
     if (vals.isEmpty) return Double.NaN
+    if (vals.size == 1) return vals.keys.head.toDouble
     if (vals.values.sum % 2 == 0) {
       findMedianEven()
     } else {
@@ -58,4 +26,34 @@ case class MedianIntBinned(binInterval:Int) {
     val v = value - (value % binInterval)
     vals(v) = vals.getOrElse(v, 0) + 1
   }
+
+  private
+
+  def findMedianOdd(): Double = {
+    findValue((vals.values.sum / 2) + 1)
+  }
+
+  def findMedianEven(): Double = {
+    val sorted = sortedSeq
+    val lowerIndex = vals.values.sum / 2
+    val upperIndex = lowerIndex + 1
+    val lowerValue = findValue(lowerIndex, sorted)
+    val upperValue = findValue(upperIndex, sorted)
+    (lowerValue + upperValue) / 2.0
+  }
+
+  def findValue(countIndex:Int, sorted:Seq[(Int, Int)] = sortedSeq) : Double = {
+    var index = 0
+    sorted.find {
+      case(value, count) => index += count; index >= countIndex
+    } match {
+      case Some(value_count) => value_count._1.toDouble
+      case None => Double.NaN
+    }
+  }
+
+  def sortedSeq : Seq[(Int, Int)] = {
+    vals.toSeq.sortWith(_._1 < _._1)
+  }
+
 }
