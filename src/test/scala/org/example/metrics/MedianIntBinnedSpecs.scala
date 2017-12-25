@@ -40,5 +40,9 @@ class MedianIntBinnedSpecs extends SpecHelper {
       }
     }
 
+    // ScalaCheck found a failure with:
+    // "2147483647", "2147483647"
+    // "-1", "-1"
+
   }
 }
