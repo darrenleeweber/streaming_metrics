@@ -8,8 +8,11 @@ case class IntStats(title:String,
   extends NumericStats[Int] {
 
   override def mean(): Double = {
-    if (count == 0) return Double.NaN
-    sum.toDouble / count.toDouble
+    if (count == 0) {
+      Double.NaN
+    } else {
+      sum.toDouble / count.toDouble
+    }
   }
 
   // Use the MedianIntBinned to conserve memory, at the expense of accuracy
