@@ -2,18 +2,21 @@ package org.example.metrics
 
 class UserStats(title:String = "users") extends Accumulator[User] {
 
-  protected val age:IntStats = IntStats("age")
-  protected val colors:ColorFavorites = ColorFavorites()
+  // Use the MedianIntBinned to conserve memory, at the expense of accuracy
+  // Bin ages into 5 year bins
+  protected val AgeBin = 5
+  protected val medianInt = MedianIntBinned(AgeBin)
+  protected val age:IntStats = IntStats("age", medianInt)
 
-  def report() : Unit = {
-    println(title)
-    age.report()
-    colors.report()
-    println
+  protected val FavoriteN = 5
+  protected val colors:ColorFavorites = ColorFavorites(FavoriteN)
+
+  def report : String = {
+    s"$title\n" + age.report + colors.report
   }
 
-  def toJSON() : String = {
-    s""""${title}": {
+  def toJSON : String = {
+    s""""$title": {
        |    "age": ${age.toJSON},
        |    "colors": ${colors.toJSON}
        |}""".stripMargin

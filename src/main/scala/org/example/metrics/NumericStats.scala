@@ -7,28 +7,28 @@ trait NumericStats[T] extends Accumulator[T] {
   def max:T
   def sum:T
 
-  def mean(): Double
+  def mean : Double
 
-  def median(): Double
+  def median : Double
 
-  def report(): Unit = {
-    println("Count:\t" + count)
-    println(s"${title}:")
-    println("\tmin:\t" + min)
-    println("\tmax:\t" + max)
-    println("\tmean:\t" + mean())
-    println("\tmedian:\t" + median())
-    println()
+  def report : String = {
+    s"""
+       |$title:
+       |\tcount:\t$count
+       |\tmin:\t$min
+       |\tmax:\t$max
+       |\tmean:\t$mean
+       |\tmedian:\t$median
+       |""".stripMargin
   }
 
-  def toJSON(): String = {
+  def toJSON : String = {
     s"""{
-       |      "count": ${count},
-       |      "min": ${min},
-       |      "max": ${max},
-       |      "mean": ${mean()}
-       |      "median": ${median()}
+       |      "count": $count,
+       |      "min": $min,
+       |      "max": $max,
+       |      "mean": $mean
+       |      "median": $median
        |    }""".stripMargin
   }
 }
-
