@@ -8,16 +8,20 @@ package org.example.metrics
 // Should behave exactly like org.example.metrics.MedianInt when `binInterval` == 1,
 // but this binned version would use _more_ memory.
 
-case class MedianIntBinned(binInterval:Int) {
+case class MedianIntBinned(binInterval:Int) extends Median[Int] {
   private val vals = collection.mutable.Map[Int, Int]()
 
-  def median(): Double = {
-    if (vals.isEmpty) return Double.NaN
-    if (vals.size == 1) return vals.keys.head.toDouble
-    if (vals.values.sum % 2 == 0) {
-      findMedianEven()
+  def median : Double = {
+    if (vals.isEmpty) {
+      Double.NaN
+    } else if (vals.size == 1) {
+      vals.keys.head.toDouble
     } else {
-      findMedianOdd()
+      if (vals.values.sum % 2 == 0) {
+        findMedianEven
+      } else {
+        findMedianOdd
+      }
     }
   }
 
@@ -29,11 +33,11 @@ case class MedianIntBinned(binInterval:Int) {
 
   private
 
-  def findMedianOdd(): Double = {
+  def findMedianOdd : Double = {
     findValue((vals.values.sum / 2) + 1)
   }
 
-  def findMedianEven(): Double = {
+  def findMedianEven : Double = {
     val sorted = sortedSeq
     val lowerIndex = vals.values.sum / 2
     val upperIndex = lowerIndex + 1

@@ -1,7 +1,7 @@
 package org.example.metrics
 
 trait Reporter {
-  def report(): Unit
+  def report : String
 
-  def toJSON(): String
+  def toJSON : String
 }
